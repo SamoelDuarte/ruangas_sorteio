@@ -131,7 +131,7 @@ if (!function_exists('isEscolhido')) {
             color: #126a6e;
             border: 2px solid #fff;
             padding: 15px;
-            font-size: 18px;
+            font-size: 14px;
             text-align: center;
             border-radius: 50px;
             cursor: pointer;
@@ -218,15 +218,13 @@ if (!function_exists('isEscolhido')) {
 
         // Função para validar o número digitado
         function validarNumero(numero) {
-        // Verifica se o número digitado é válido (não vazio e numérico)
-        if (numero.trim() === '') return;
-
-        // Verifica se o número já foi escolhido
-        if (numerosEscolhidos.includes(numero)) {
-            alert("Número indisponível! Por favor, escolha outro número.");
-            document.getElementById("numeroSorte").value = ""; // Limpa o campo de input
+            console.log(numerosEscolhidos);
+            
+            if (numerosEscolhidos.includes(parseInt(numero))) {
+                alert("Número indisponível! Por favor, escolha outro número.");
+                document.getElementById("numeroSorte").value = ""; // Limpa o campo de input
+            }
         }
-    }
 
         // Função para salvar a escolha
         function salvarEscolha() {
