@@ -9,8 +9,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Recuperar todos os sorteios
-        $sorteios = Sorteio::with('clientes')->get();
+        $sorteios = Sorteio::with('clientes')->orderBy('id', 'desc')->get();
+
 
         // Estruturar os dados para exibir no dashboard
         $dados = $sorteios->map(function ($sorteio) {
@@ -19,6 +19,7 @@ class DashboardController extends Controller
 
             return [
                 'nome' => $sorteio->nome,
+                'numero_sorteio' => $sorteio->numero_sorteio,
                 'data_inicio' => $sorteio->getDataInicioFormatadaAttribute(),
                 'data_termino' => $sorteio->getDataTerminoFormatadaAttribute(),
                 'total_clientes' => $totalClientes,

@@ -16,7 +16,7 @@ class SorteioController extends Controller
     public function cliente($telefone)
     {
         // Buscar o cliente pelo telefone
-        $cliente = Cliente::where('telefone', $telefone)->firstOrFail();
+        $cliente = Cliente::where(['telefone' => $telefone , "numero_da_sorte" => null])->firstOrFail();
         // Verifica se o cliente já tem um número da sorte
         if ($cliente->numero_da_sorte) {
             // Se o cliente já tem um número da sorte, chama a view sorteio.link_usado

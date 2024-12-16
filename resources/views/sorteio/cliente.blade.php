@@ -171,7 +171,8 @@ if (!function_exists('isEscolhido')) {
 <body>
 
     <div class="container">
-        <h1>Sorteio Ruan Gas</h1>
+        <h2><?php echo $cliente->sorteio->nome; ?> </h2>
+        <h1>Ruan Gas</h1>
         <p>Escolha um número da sorte para participar do sorteio incrível! Insira o número desejado e clique no botão
             para salvar sua escolha.</p>
 

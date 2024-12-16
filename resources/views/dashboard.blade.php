@@ -47,6 +47,7 @@
                     </div>
                     <div class="card-body bg-light">
                         <div class="d-flex flex-column align-items-center">
+                            <p class="text-muted"><strong>N°:</strong> {{ $sorteio['numero_sorteio'] }}</p>
                             <p class="text-muted"><i class="fas fa-calendar-alt"></i> <strong>Data de Início:</strong> {{ $sorteio['data_inicio'] }}</p>
                             <p class="text-muted"><i class="fas fa-calendar-check"></i> <strong>Data de Término:</strong> {{ $sorteio['data_termino'] }}</p>
                             <p class="text-info"><i class="fas fa-user-friends"></i> <strong>Total de Inscritos:</strong> {{ $sorteio['total_clientes'] }}</p>
