@@ -1,17 +1,25 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
+@section('content')
+<div class="container">
+    <h1 class="text-center my-4">Dashboard de Sorteios</h1>
+
+    <div class="row">
+        @foreach ($dados as $sorteio)
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title">{{ $sorteio['nome'] }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Data de Início:</strong> {{ $sorteio['data_inicio'] }}</p>
+                        <p><strong>Data de Término:</strong> {{ $sorteio['data_termino'] }}</p>
+                        <p><strong>Total de Inscritos:</strong> {{ $sorteio['total_clientes'] }}</p>
+                        <p><strong>Total de Participantes:</strong> {{ $sorteio['total_participantes'] }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endforeach
     </div>
-</x-app-layout>
+</div>
+@endsection

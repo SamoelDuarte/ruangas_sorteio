@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CronController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SorteioController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -42,9 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/sorteio/delete/{id}', [SorteioController::class, 'destroy'])->name('sorteio.destroy');
 
 
-    Route::get('/', function () {
-        return view('dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+
+    Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+
+
 });
 
 
