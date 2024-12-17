@@ -111,4 +111,34 @@ class SorteioController extends Controller
         // Retornar a view de agradecimento com os números
         return view('sorteio.agradecer_cliente', compact('cliente', 'numerosEscolhidos'));
     }
+
+    public function buscarGanhador(Request $request)
+    {
+        $sorteio = $request->input('sorteio');
+        $numero = $request->input('numero');
+
+        // dd($request->all());
+
+        // Buscando o número sorteado na tabela numero_da_sorte e associando com o cliente e sorteio
+        $numeroDaSorte = NumeroDaSorte::with('cliente')->where('numero', $numero)
+                                      ->where('sorteio_id', $sorteio)
+                                      ->first();
+
+
+        if ($numeroDaSorte) {
+            // Obtendo o cliente associado ao número sorteado
+            $cliente = $numeroDaSorte->cliente;
+
+            // Verificando se o cliente existe e retornando os dados
+            if ($cliente) {
+                return response()->json([
+                    'success' => true,
+                    'cliente' => $cliente
+                ]);
+            }
+        }
+
+        // Caso o número ou o cliente não sejam encontrados
+        return response()->json(['success' => false]);
+    }
 }

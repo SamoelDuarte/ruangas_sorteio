@@ -19,6 +19,7 @@ class DashboardController extends Controller
 
             return [
                 'nome' => $sorteio->nome,
+                'sorteio_id' => $sorteio->id,
                 'numero_sorteio' => $sorteio->numero_sorteio,
                 'data_inicio' => $sorteio->getDataInicioFormatadaAttribute(),
                 'data_termino' => $sorteio->getDataTerminoFormatadaAttribute(),

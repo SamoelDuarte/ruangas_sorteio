@@ -2,41 +2,63 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
-
 <style>
     /* Efeito de hover no card */
-.hover-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
-}
-
-/* Gradiente para o header */
-.bg-gradient-primary {
-    background: linear-gradient(45deg, #007bff, #0056b3);
-}
-
-/* Animações */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Gradiente para o header */
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+    }
+
+    /* Animações */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
+
 @section('content')
 <div class="container">
     <h1 class="text-center my-4 display-4 fw-bold text-primary animate__animated animate__fadeInDown">
         🎉 Sorteios Atuais 🎉
     </h1>
+
+    <!-- Input para buscar o ganhador -->
+    <div class="row my-4">
+        <div class="col-md-6">
+            <label for="sorteioSelect" class="form-label">Escolha o Sorteio</label>
+            <select id="sorteioSelect" class="form-control">
+                <option value="">Selecione um Sorteio</option>
+                @foreach ($dados as $sorteio)
+                    <option value="{{ $sorteio['sorteio_id'] }}">{{ $sorteio['nome'] }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="numeroInput" class="form-label">Digite o Número</label>
+            <input type="text" id="numeroInput" class="form-control" placeholder="Número do Ganhador">
+        </div>
+        <div class="col-12 text-center my-3">
+            <button id="buscarGanhador" class="btn btn-primary">Buscar Ganhador</button>
+        </div>
+    </div>
+
+    <!-- Resultado da Busca -->
+    <div id="resultado" class="text-center"></div>
 
     <div class="row">
         @foreach ($dados as $sorteio)
@@ -64,4 +86,40 @@
         @endforeach
     </div>
 </div>
+
+@endsection
+
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#buscarGanhador').click(function() {
+            var sorteio = $('#sorteioSelect').val();
+            var numero = $('#numeroInput').val();
+
+            if (sorteio && numero) {
+                $.ajax({
+                    url: '/buscar-ganhador', // A rota que será chamada
+                    method: 'GET',
+                    data: {
+                        sorteio: sorteio,
+                        numero: numero
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#resultado').html('<div class="alert alert-success">O ganhador é: ' + response.cliente.telefone + '</div>');
+                        } else {
+                            $('#resultado').html('<div class="alert alert-danger">Número não encontrado ou inválido!</div>');
+                        }
+                    },
+                    error: function() {
+                        $('#resultado').html('<div class="alert alert-danger">Erro ao buscar o ganhador. Tente novamente.</div>');
+                    }
+                });
+            } else {
+                $('#resultado').html('<div class="alert alert-warning">Por favor, preencha todos os campos!</div>');
+            }
+        });
+    });
+</script>
 @endsection

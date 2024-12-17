@@ -46,6 +46,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/buscar-ganhador', [SorteioController::class, 'buscarGanhador']);
+
+
 
 });
 

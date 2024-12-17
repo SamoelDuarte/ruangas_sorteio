@@ -223,7 +223,7 @@ if (!function_exists('isEscolhido')) {
             if (numero.trim() === '') return;
 
             // Verifica se o número já foi escolhido
-            if (numerosEscolhidos.includes(numero)) {
+            if (numerosEscolhidosCliente.includes(numero)) {
                 alert("Número indisponível! Por favor, escolha outro número.");
                 document.getElementById(nome).value = ""; // Limpa o campo de input
             }
