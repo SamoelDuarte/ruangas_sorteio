@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\NumeroDaSorte;
 use App\Models\Sorteio;
 use Illuminate\Http\Request;
 
@@ -15,21 +16,22 @@ class SorteioController extends Controller
      */
     public function cliente($telefone)
     {
-        // Buscar o cliente pelo telefone
-        $cliente = Cliente::where(['telefone' => $telefone , "numero_da_sorte" => null])->firstOrFail();
-        // Verifica se o cliente já tem um número da sorte
-        if ($cliente->numero_da_sorte) {
-            // Se o cliente já tem um número da sorte, chama a view sorteio.link_usado
-            return view('sorteio.link_usado', compact('cliente'));
-        }
-        $numerosEscolhidos = Cliente::where('sorteio_id', $cliente->sorteio_id)
-            ->pluck('numero_da_sorte') // Pega os números da sorte
+        // Buscar o cliente pelo telefone e pegar o mais recente, com base no 'created_at' ou 'updated_at'
+        $cliente = Cliente::where('telefone', $telefone)
+            ->latest() // Isso irá garantir que pegue o cliente mais recente
+            ->firstOrFail();
+
+        // Buscar os números já escolhidos para o sorteio do cliente
+        $numerosEscolhidos = NumeroDaSorte::whereHas('cliente', function ($query) use ($cliente) {
+            $query->where('sorteio_id', $cliente->sorteio_id);
+        })->pluck('numero')
             ->map(fn($numero) => (string) $numero) // Converte para string, se necessário
-            ->values() // Reindexa para remover quaisquer índices
-            ->toArray(); // Converte em array simples
+            ->toArray();
 
+        // Quantidade máxima de números permitidos para o cliente
+        $quantidadeNumeros = $cliente->quantidade_numeros;
 
-        return view('sorteio.cliente', compact('cliente', 'numerosEscolhidos'));
+        return view('sorteio.cliente', compact('cliente', 'numerosEscolhidos', 'quantidadeNumeros'));
     }
 
     public function index()
@@ -77,18 +79,36 @@ class SorteioController extends Controller
 
     public function salvarNumeroSorte(Request $request, $id)
     {
-        // Validação do número
+        // Validação dos números
         $validated = $request->validate([
-            'numero_sorte' => 'required|numeric|digits:4',
+            'numeros_sorte' => 'required|array',
+            'numeros_sorte.*' => 'required|numeric|digits:4',
         ]);
 
-        // Obtenha o sorteio pelo ID
+        // Obter o cliente pelo ID
         $cliente = Cliente::findOrFail($id);
 
-        // Salve o número da sorte (ajuste conforme sua lógica de negócio)
-        $cliente->numero_da_sorte = $request->numero_sorte;
-        $cliente->save();
+        // Buscar a quantidade máxima permitida
+        $quantidadeMaxima = $cliente->quantidade_numeros;
 
-        return view('sorteio.agradecer_cliente', compact('cliente'));
+        // Verificar se a quantidade excede o permitido
+        if (count($validated['numeros_sorte']) > $quantidadeMaxima) {
+            return back()->with('error', 'Você pode escolher no máximo ' . $quantidadeMaxima . ' números.');
+        }
+
+        // Salvar os números escolhidos na tabela numeros_sorte
+        foreach ($validated['numeros_sorte'] as $numero) {
+            NumeroDaSorte::create([
+                'cliente_id' => $cliente->id,
+                'sorteio_id' => $cliente->sorteio_id,
+                'numero' => $numero,
+            ]);
+        }
+
+        // Recuperar os números que o cliente escolheu
+        $numerosEscolhidos = NumeroDaSorte::where('cliente_id', $cliente->id)->pluck('numero');
+
+        // Retornar a view de agradecimento com os números
+        return view('sorteio.agradecer_cliente', compact('cliente', 'numerosEscolhidos'));
     }
 }

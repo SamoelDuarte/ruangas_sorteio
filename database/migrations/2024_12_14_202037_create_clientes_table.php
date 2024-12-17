@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('telefone')->nullable(); // Campo para telefone
             $table->string('link')->nullable(); // Campo para link, opcional
-            $table->integer('numero_da_sorte')->nullable(); // Campo para número da sorte
+            $table->integer('quantidade_numeros')->default(1); // Campo para número da sorte
             $table->timestamps(); // Campos created_at e updated_at
         });
     }

@@ -47,4 +47,11 @@ class Sorteio extends Model
     {
         return $this->data_termino ? Carbon::parse($this->data_termino)->format('d/m/Y') : null;
     }
+
+    // Relacionamento: Sorteio possui muitos números da sorte.
+public function numerosDaSorte()
+{
+    return $this->hasMany(NumeroDaSorte::class);
+}
+
 }

@@ -13,8 +13,8 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        $clientes = Cliente::with('sorteio')->orderBy('id', 'desc')->get();
-
+        // Carregar os clientes com seus respectivos sorteios e números da sorte
+        $clientes = Cliente::with(['sorteio', 'numerosSorte'])->orderBy('id', 'desc')->get();
 
         // Buscar todos os sorteios disponíveis
         $sorteios = Sorteio::all();
@@ -29,17 +29,18 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'telefone' => 'required',
-            'sorteio_id' => 'required|exists:sorteios,id',  // Validando que o sorteio existe
+            'telefone' => 'required|string',
+            'sorteio_id' => 'required|exists:sorteios,id',
+            'quantidade_numeros' => 'required|integer|min:1',
         ]);
 
-        // Criando o cliente com o sorteio associado
         Cliente::create([
             'telefone' => $request->telefone,
             'sorteio_id' => $request->sorteio_id,
+            'quantidade_numeros' => $request->quantidade_numeros,
         ]);
 
-        return redirect()->route('cliente.index');
+        return redirect()->route('cliente.index')->with('success', 'Cliente cadastrado com sucesso!');
     }
 
     /**

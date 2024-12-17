@@ -69,6 +69,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -81,8 +82,15 @@
 
     <div class="container">
         <h1>Obrigado, {{ $cliente->nome }}!</h1>
-        <p>Você escolheu o número da sorte:</p>
-        <div class="numero-sorte">{{ $cliente->numero_da_sorte }}</div>
+        <p>Você escolheu os números da sorte:</p>
+        
+        <!-- Listando os números da sorte -->
+        <div>
+            @foreach ($numerosEscolhidos as $numero)
+                <div class="numero-sorte">{{ $numero }}</div>
+            @endforeach
+        </div>
+
         <p>Desejamos boa sorte no sorteio!</p>
     </div>
 

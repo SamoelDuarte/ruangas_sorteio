@@ -28,7 +28,7 @@
             <tr>
                 <th>ID</th>
                 <th>Telefone</th>
-                <th>Número da Sorte</th>
+                <th>Número(s) da Sorte</th>
                 <th>Sorteio</th>
                 <th>Link</th>
                 <th>Ações</th>
@@ -39,7 +39,15 @@
                 <tr>
                     <td>{{ $cliente->id }}</td>
                     <td>{{ $cliente->telefone }}</td>
-                    <td>{{ $cliente->numero_da_sorte }}</td>
+                    <td>
+                        @if ($cliente->numerosSorte->count() > 0)
+                            @foreach ($cliente->numerosSorte as $numero)
+                               (  {{ $numero->numero }}  ) <!-- Exibindo cada número da sorte -->
+                            @endforeach
+                        @else
+                            <span>Sem número da sorte</span>
+                        @endif
+                    </td>
                     <td>{{ $cliente->sorteio->nome }}</td>
                     <td>
                         @if ($cliente->link)
@@ -69,6 +77,7 @@
             @endforeach
         </tbody>
     </table>
+
     <!-- Modal para Adicionar Cliente -->
     <div class="modal fade" id="addClienteModal" tabindex="-1" aria-labelledby="addClienteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -85,6 +94,12 @@
                             <label for="telefone" class="form-label">Telefone</label>
                             <input type="text" class="form-control" id="telefone" name="telefone"
                                 placeholder="Digite o telefone" required>
+                        </div>
+                        <!-- Campo de Quantidade de Números da Sorte -->
+                        <div class="mb-3">
+                            <label for="quantidade_numeros" class="form-label">Quantidade de Números</label>
+                            <input type="number" class="form-control" id="quantidade_numeros" name="quantidade_numeros"
+                                placeholder="Digite a quantidade" min="1" required>
                         </div>
 
                         <!-- Campo de Seleção de Sorteio -->

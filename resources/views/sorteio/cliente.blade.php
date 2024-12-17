@@ -182,65 +182,82 @@ if (!function_exists('isEscolhido')) {
             <p><strong>Data de Início:</strong> <?php echo $cliente->sorteio->data_inicio_formatada; ?></p>
             <p><strong>Data de Término:</strong> <?php echo $cliente->sorteio->data_termino_formatada; ?></p>
         </div>
+        <!-- Inputs Dinâmicos para Escolher os Números -->
         <form action="{{ route('sorteio.salvarNumeroSorte', ['id' => $cliente->id]) }}" method="POST">
-            @csrf <!-- Garante a proteção CSRF -->
+            @csrf <!-- Proteção CSRF -->
+            <p>Você pode escolher até <strong>{{ $quantidadeNumeros }}</strong> números da sorte.</p>
+            <!-- Inputs para escolher números da sorte -->
+            <div id="inputsNumeros" style="margin: 10px 0;">
+                @for ($i = 0; $i < $quantidadeNumeros; $i++)
+                <input type="text" class="form-control numero-input" id="numeroInput{{ $i }}"
+                name="numeros_sorte[]" placeholder="Escolha o número {{ $i + 1 }}" maxlength="4"
+                oninput="validarNumero(this.value, 'numeroInput{{ $i }}')">
+                @endfor
+            </div>
 
-            <!-- Input para escolher o número da sorte -->
-            <input type="text" id="numeroSorte" name="numero_sorte" maxlength="4"
-                placeholder="Digite seu número da sorte" oninput="validarNumero(this.value)">
-
-            <!-- Botão para salvar a escolha -->
-            <button type="submit">Salvar</button>
+            <button type="submit" class="btn btn-primary">Salvar Escolhas</button>
         </form>
 
     </div>
 
-    <!-- Container para os botões de números -->
-    <div class="numero-container container" id="numeroContainer">
+    <!-- Container de Botões de Números -->
+    <div class="numero-container" id="numeroContainer">
         <?php
-        // Loop para criar os botões de 1000 a 9999
         for ($i = 1000; $i <= 9999; $i++) {
-            // Verifica se o número já foi escolhido
-            $disabledClass = isEscolhido($i, $numerosEscolhidos) ? 'disabled-btn' : '';
-            $onclick = isEscolhido($i, $numerosEscolhidos) ? '' : 'onclick="selecionarNumero(' . $i . ')"';
+            $disabledClass = in_array($i, $numerosEscolhidos) ? 'disabled-btn' : '';
+            $onclick = in_array($i, $numerosEscolhidos) ? '' : 'onclick="selecionarNumero(' . $i . ')"';
             echo '<div class="numero-btn ' . $disabledClass . '" ' . $onclick . '>' . $i . '</div>';
         }
         ?>
     </div>
 
     <script>
-        // Números já escolhidos (deve ser sincronizado com o backend)
+        let numerosEscolhidosCliente = []; // Armazena os números escolhidos
         const numerosEscolhidos = <?php echo json_encode($numerosEscolhidos); ?>;
+        const maxNumeros = {{ $quantidadeNumeros }}; // Quantidade máxima de números permitidos
 
-        // Função para preencher o input com o número escolhido
+        function validarNumero(numero, nome) {
+            console.log(nome);
+            
+            // Verifica se o número digitado é válido (não vazio e numérico)
+            if (numero.trim() === '') return;
+
+            // Verifica se o número já foi escolhido
+            if (numerosEscolhidos.includes(numero)) {
+                alert("Número indisponível! Por favor, escolha outro número.");
+                document.getElementById(nome).value = ""; // Limpa o campo de input
+            }
+        }
+
+
+        // Função para selecionar um número
         function selecionarNumero(numero) {
-            document.getElementById("numeroSorte").value = numero;
-        }
-
-        // Função para validar o número digitado
-        function validarNumero(numero) {
-        // Verifica se o número digitado é válido (não vazio e numérico)
-        if (numero.trim() === '') return;
-
-        // Verifica se o número já foi escolhido
-        if (numerosEscolhidos.includes(numero)) {
-            alert("Número indisponível! Por favor, escolha outro número.");
-            document.getElementById("numeroSorte").value = ""; // Limpa o campo de input
-        }
-    }
-
-        // Função para salvar a escolha
-        function salvarEscolha() {
-            const numeroEscolhido = document.getElementById("numeroSorte").value;
-
-            if (!numeroEscolhido) {
-                alert("Por favor, escolha um número da sorte.");
+            if (numerosEscolhidosCliente.length >= maxNumeros) {
+                alert("Você já selecionou todos os números permitidos!");
                 return;
             }
 
-            // Lógica de salvar o número no backend pode ser implementada aqui
-            alert("Número " + numeroEscolhido + " salvo com sucesso!");
+            if (numerosEscolhidosCliente.includes(numero)) {
+                alert("Número já selecionado. Escolha outro.");
+                return;
+            }
+
+            // Adiciona o número escolhido no array
+            numerosEscolhidosCliente.push(numero);
+
+            // Preenche o próximo input disponível
+            const index = numerosEscolhidosCliente.length - 1;
+            document.getElementById(`numeroInput${index}`).value = numero;
+
+            // Desativa o botão do número escolhido
+            const btn = document.querySelector(`.numero-btn:contains("${numero}")`);
+            if (btn) btn.classList.add('disabled-btn');
         }
+
+        // Estilizar o botão escolhido
+        HTMLElement.prototype.containsText = function(text) {
+            return this.textContent.includes(text);
+        };
     </script>
 
 </body>

@@ -26,7 +26,7 @@ class Cliente extends Model
         'telefone',
         'link',
         'sorteio_id',
-        'numero_da_sorte',
+        'quantidade_numeros',
     ];
 
 
@@ -34,23 +34,32 @@ class Cliente extends Model
     {
         // Limpar o telefone, removendo qualquer caractere que não seja número
         $telefoneLimpo = preg_replace('/\D/', '', $value);
-    
+
         // Codificar o telefone com Base64
         $this->attributes['telefone'] = base64_encode($telefoneLimpo);
-    
+
         // Criar o link com o telefone codificado
-        $this->attributes['link'] = env('APP_URL')."/sorteio/". $this->attributes['telefone'];
+        $this->attributes['link'] = env('APP_URL') . "/sorteio/" . $this->attributes['telefone'];
     }
-    
+
+    public function numerosSorte()
+    {
+        return $this->hasMany(NumeroDaSorte::class, 'cliente_id');
+    }
+
     public function getTelefoneAttribute($value)
     {
         // Decodificar o telefone codificado antes de retorná-lo
         return base64_decode($value);
     }
-   
-    public function sorteio()
-{
-    return $this->belongsTo(Sorteio::class);
-}
 
+    public function getNumerosSortePorSorteio($sorteioId)
+    {
+        return $this->numerosSorte()->where('sorteio_id', $sorteioId)->pluck('numero');
+    }
+
+    public function sorteio()
+    {
+        return $this->belongsTo(Sorteio::class);
+    }
 }
