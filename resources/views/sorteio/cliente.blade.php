@@ -28,7 +28,7 @@ if (!function_exists('isEscolhido')) {
 
         body {
             font-family: 'Raleway', sans-serif;
-            background-image: url('/assets/imagens/fundo.jpg');
+            background-image: url('/public/assets/imagens/fundo.jpg');
             /* Substitua com o caminho da sua imagem */
             background-size: cover;
             background-position: center;
@@ -193,7 +193,7 @@ if (!function_exists('isEscolhido')) {
                 <h2><?php echo $cliente->sorteio->nome; ?> </h2>
                 <h1>Ruan Gás</h1>
             </div>
-            <img src="/assets/imagens/icone.png" alt="Imagem de fundo" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);  z-index: 1;" class="imagem-sorteio">
+            <img src="/public/assets/imagens/icone.png" alt="Imagem de fundo" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);  z-index: 1;" class="imagem-sorteio">
         </div>
     
         <!-- Informações do Sorteio -->
