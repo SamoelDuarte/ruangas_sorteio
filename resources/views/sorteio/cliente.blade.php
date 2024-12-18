@@ -169,6 +169,19 @@ if (!function_exists('isEscolhido')) {
             font-size: 18px;
         }
     </style>
+    <style>
+        /* Estilo padrão para desktop */
+        .imagem-sorteio {
+            width: 153px;
+        }
+    
+        /* Estilo para a versão mobile */
+        @media (max-width: 768px) {
+            .imagem-sorteio {
+                width: 86px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -180,7 +193,7 @@ if (!function_exists('isEscolhido')) {
                 <h2><?php echo $cliente->sorteio->nome; ?> </h2>
                 <h1>Ruan Gás</h1>
             </div>
-            <img src="/assets/imagens/icone.png" alt="Imagem de fundo" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 153px; z-index: 1;">
+            <img src="/assets/imagens/icone.png" alt="Imagem de fundo" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);  z-index: 1;" class="imagem-sorteio">
         </div>
     
         <!-- Informações do Sorteio -->
