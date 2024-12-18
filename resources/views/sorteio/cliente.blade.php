@@ -28,11 +28,14 @@ if (!function_exists('isEscolhido')) {
 
         body {
             font-family: 'Raleway', sans-serif;
-            background-color: #f8f9fa;
+            background-image: url('/assets/imagens/fundo.jpg');
+            /* Substitua com o caminho da sua imagem */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             color: #333;
             flex-direction: column;
         }
@@ -171,11 +174,15 @@ if (!function_exists('isEscolhido')) {
 <body>
 
     <div class="container">
-        <h2><?php echo $cliente->sorteio->nome; ?> </h2>
-        <h1>Ruan Gas</h1>
-        <p>Escolha um número da sorte para participar do sorteio incrível! Insira o número desejado e clique no botão
-            para salvar sua escolha.</p>
 
+        <div style="position: relative; text-align: center;">
+            <div style="display: inline-block; position: relative; z-index: 2;">
+                <h2><?php echo $cliente->sorteio->nome; ?> </h2>
+                <h1>Ruan Gás</h1>
+            </div>
+            <img src="/assets/imagens/icone.png" alt="Imagem de fundo" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 153px; z-index: 1;">
+        </div>
+    
         <!-- Informações do Sorteio -->
         <div class="info-sorteio">
             <p><strong>Número do Sorteio:</strong> <?php echo $cliente->sorteio->numero_sorteio; ?></p>
@@ -189,9 +196,9 @@ if (!function_exists('isEscolhido')) {
             <!-- Inputs para escolher números da sorte -->
             <div id="inputsNumeros" style="margin: 10px 0;">
                 @for ($i = 0; $i < $quantidadeNumeros; $i++)
-                <input type="text" class="form-control numero-input" id="numeroInput{{ $i }}"
-                name="numeros_sorte[]" placeholder="Escolha o número {{ $i + 1 }}" maxlength="4"
-                oninput="validarNumero(this.value, 'numeroInput{{ $i }}')">
+                    <input type="text" required class="form-control numero-input" id="numeroInput{{ $i }}"
+                        name="numeros_sorte[]" placeholder="Escolha o número {{ $i + 1 }}" maxlength="4"
+                        oninput="validarNumero(this.value, 'numeroInput{{ $i }}')">
                 @endfor
             </div>
 
@@ -218,7 +225,7 @@ if (!function_exists('isEscolhido')) {
 
         function validarNumero(numero, nome) {
             console.log(nome);
-            
+
             // Verifica se o número digitado é válido (não vazio e numérico)
             if (numero.trim() === '') return;
 

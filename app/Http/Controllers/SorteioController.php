@@ -20,6 +20,7 @@ class SorteioController extends Controller
         $cliente = Cliente::where('telefone', $telefone)
             ->latest() // Isso irá garantir que pegue o cliente mais recente
             ->firstOrFail();
+        // dd($cliente);
 
         // Buscar os números já escolhidos para o sorteio do cliente
         $numerosEscolhidos = NumeroDaSorte::whereHas('cliente', function ($query) use ($cliente) {
@@ -28,11 +29,27 @@ class SorteioController extends Controller
             ->map(fn($numero) => (string) $numero) // Converte para string, se necessário
             ->toArray();
 
+             // Buscar os números já escolhidos para o sorteio do cliente
+        $numerosEscolhidosPeloCliente = NumeroDaSorte::whereHas('cliente', function ($query) use ($cliente) {
+            $query->where('sorteio_id', $cliente->sorteio_id)->where('cliente_id', $cliente->id);
+        })->pluck('numero')
+            ->map(fn($numero) => (string) $numero) // Converte para string, se necessário
+            ->toArray();
+
         // Quantidade máxima de números permitidos para o cliente
         $quantidadeNumeros = $cliente->quantidade_numeros;
 
+        // Verificar se o cliente já escolheu a quantidade máxima de números
+        if (count($numerosEscolhidosPeloCliente) >= $quantidadeNumeros) {
+            // Se já atingiu o limite, redireciona para a view 'sorteio.link_usado'
+
+            return view('sorteio.link_usado', compact('cliente', 'numerosEscolhidos', 'quantidadeNumeros'));
+        }
+
+        // Caso contrário, exibe a página de sorteio
         return view('sorteio.cliente', compact('cliente', 'numerosEscolhidos', 'quantidadeNumeros'));
     }
+
 
     public function index()
     {
@@ -79,37 +96,38 @@ class SorteioController extends Controller
 
     public function salvarNumeroSorte(Request $request, $id)
     {
-        // Validação dos números
-        $validated = $request->validate([
-            'numeros_sorte' => 'required|array',
-            'numeros_sorte.*' => 'required|numeric|digits:4',
-        ]);
-
-        // Obter o cliente pelo ID
+        // Recuperar o cliente pelo ID
         $cliente = Cliente::findOrFail($id);
 
-        // Buscar a quantidade máxima permitida
-        $quantidadeMaxima = $cliente->quantidade_numeros;
+        // Buscar os números já escolhidos para o sorteio do cliente
+        $numerosEscolhidos = NumeroDaSorte::whereHas('cliente', function ($query) use ($cliente) {
+            $query->where('sorteio_id', $cliente->sorteio_id)->where('cliente_id', $cliente->id);
+        })->pluck('numero')
+            ->map(fn($numero) => (string) $numero)
+            ->toArray();
 
-        // Verificar se a quantidade excede o permitido
-        if (count($validated['numeros_sorte']) > $quantidadeMaxima) {
-            return back()->with('error', 'Você pode escolher no máximo ' . $quantidadeMaxima . ' números.');
+        // Quantidade máxima de números permitidos para o cliente
+        $quantidadeNumeros = $cliente->quantidade_numeros;
+
+        // Verificar se o cliente já atingiu o limite de números
+        if (count($numerosEscolhidos) >= $quantidadeNumeros) {
+            // Redireciona para a página de "link usado" caso já tenha atingido o limite
+            return view('sorteio.link_usado', compact('cliente', 'numerosEscolhidos', 'quantidadeNumeros'));
         }
 
-        // Salvar os números escolhidos na tabela numeros_sorte
-        foreach ($validated['numeros_sorte'] as $numero) {
+        // Validar os números que estão sendo enviados no formulário
+        $numeros = $request->input('numeros_sorte');
+        foreach ($numeros as $numero) {
+            // Caso o número não tenha sido escolhido, salva o número
             NumeroDaSorte::create([
                 'cliente_id' => $cliente->id,
-                'sorteio_id' => $cliente->sorteio_id,
                 'numero' => $numero,
+                'sorteio_id' => $cliente->sorteio_id,
             ]);
         }
 
-        // Recuperar os números que o cliente escolheu
-        $numerosEscolhidos = NumeroDaSorte::where('cliente_id', $cliente->id)->pluck('numero');
-
-        // Retornar a view de agradecimento com os números
-        return view('sorteio.agradecer_cliente', compact('cliente', 'numerosEscolhidos'));
+        // Caso contrário, retorna para a página cliente
+        return view('sorteio.agradecer_cliente', compact('numeros'));
     }
 
     public function buscarGanhador(Request $request)
@@ -121,8 +139,8 @@ class SorteioController extends Controller
 
         // Buscando o número sorteado na tabela numero_da_sorte e associando com o cliente e sorteio
         $numeroDaSorte = NumeroDaSorte::with('cliente')->where('numero', $numero)
-                                      ->where('sorteio_id', $sorteio)
-                                      ->first();
+            ->where('sorteio_id', $sorteio)
+            ->first();
 
 
         if ($numeroDaSorte) {

@@ -81,12 +81,12 @@
 <body>
 
     <div class="container">
-        <h1>Obrigado, {{ $cliente->nome }}!</h1>
+        <h1>Obrigado!</h1>
         <p>Você escolheu os números da sorte:</p>
         
         <!-- Listando os números da sorte -->
         <div>
-            @foreach ($numerosEscolhidos as $numero)
+            @foreach ($numeros as $numero)
                 <div class="numero-sorte">{{ $numero }}</div>
             @endforeach
         </div>

@@ -9,14 +9,16 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $sorteios = Sorteio::with('clientes')->orderBy('id', 'desc')->get();
-
-
+        $sorteios = Sorteio::with('numerosDaSorte.cliente')->orderBy('id', 'desc')->get();
+    
         // Estruturar os dados para exibir no dashboard
         $dados = $sorteios->map(function ($sorteio) {
+            // Contagem de clientes (total de inscritos)
             $totalClientes = $sorteio->clientes->count();
-            $totalParticipantes = $sorteio->clientes->whereNotNull('numero_da_sorte')->count();
-
+    
+            // Contagem de participantes distintos
+            $totalParticipantes = $sorteio->numerosDaSorte->pluck('cliente_id')->unique()->count();
+    
             return [
                 'nome' => $sorteio->nome,
                 'sorteio_id' => $sorteio->id,
@@ -27,8 +29,9 @@ class DashboardController extends Controller
                 'total_participantes' => $totalParticipantes,
             ];
         });
-
+    
         // Retornar para a view com os dados
         return view('dashboard', compact('dados'));
     }
+
 }
