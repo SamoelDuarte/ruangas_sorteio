@@ -26,8 +26,8 @@ return new class extends Migration
 
         User::create([
             'name' => 'Admin',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('123'), // Hash a senha para segurança
+            'email' => 'ruangasacesso5@gmail.com',
+            'password' => Hash::make('CompanyRuan644$'), // Hash a senha para segurança
         ]);
     }
 
