@@ -203,15 +203,15 @@ if (!function_exists('isEscolhido')) {
             <p><strong>Data de Término:</strong> <?php echo $cliente->sorteio->data_termino_formatada; ?></p>
         </div>
         <!-- Inputs Dinâmicos para Escolher os Números -->
-        <form action="{{ route('sorteio.salvarNumeroSorte', ['id' => $cliente->id]) }}" method="POST">
+        <form action="{{ route('sorteio.salvarNumeroSorte', ['id' => $cliente->id]) }}" method="POST" onsubmit="return validarFormulario();">
             @csrf <!-- Proteção CSRF -->
             <p>Você pode escolher até <strong>{{ $quantidadeNumeros }}</strong> números da sorte.</p>
             <!-- Inputs para escolher números da sorte -->
             <div id="inputsNumeros" style="margin: 10px 0;">
                 @for ($i = 0; $i < $quantidadeNumeros; $i++)
                     <input type="text" required class="form-control numero-input" id="numeroInput{{ $i }}"
-                        name="numeros_sorte[]" placeholder="Escolha o número {{ $i + 1 }}" maxlength="4"
-                        oninput="validarNumero(this.value, 'numeroInput{{ $i }}')">
+                        name="numeros_sorte[]" placeholder="Escolha o número {{ $i + 1 }}" maxlength="4">
+
                 @endfor
             </div>
 
@@ -220,10 +220,9 @@ if (!function_exists('isEscolhido')) {
 
     </div>
 
-    <!-- Container de Botões de Números -->
     <div class="numero-container" id="numeroContainer">
         <?php
-        for ($i = 1000; $i <= 9999; $i++) {
+        for ($i = 1; $i <= 9999; $i++) {
             $disabledClass = in_array($i, $numerosEscolhidos) ? 'disabled-btn' : '';
             $onclick = in_array($i, $numerosEscolhidos) ? '' : 'onclick="selecionarNumero(' . $i . ')"';
             echo '<div class="numero-btn ' . $disabledClass . '" ' . $onclick . '>' . $i . '</div>';
@@ -237,18 +236,15 @@ if (!function_exists('isEscolhido')) {
         const maxNumeros = {{ $quantidadeNumeros }}; // Quantidade máxima de números permitidos
 
         function validarNumero(numero, nome) {
-            console.log(nome);
-
             // Verifica se o número digitado é válido (não vazio e numérico)
             if (numero.trim() === '') return;
 
             // Verifica se o número já foi escolhido
-            if (numerosEscolhidosCliente.includes(numero)) {
+            if (numerosEscolhidos.includes(numero)) {
                 alert("Número indisponível! Por favor, escolha outro número.");
                 document.getElementById(nome).value = ""; // Limpa o campo de input
             }
         }
-
 
         // Função para selecionar um número
         function selecionarNumero(numero) {
@@ -274,10 +270,37 @@ if (!function_exists('isEscolhido')) {
             if (btn) btn.classList.add('disabled-btn');
         }
 
-        // Estilizar o botão escolhido
-        HTMLElement.prototype.containsText = function(text) {
-            return this.textContent.includes(text);
-        };
+        // Função para validar o formulário antes do envio
+      // Função para validar o formulário antes do envio
+function validarFormulario() {
+    // Coleta todos os valores dos campos de entrada
+    const numerosInputs = document.querySelectorAll('input[name="numeros_sorte[]"]');
+    let numerosDigitados = [];
+    
+    for (let input of numerosInputs) {
+        let numero = input.value.trim();
+        
+        if (numero === "") continue; // Ignora campos vazios
+        
+        // Verifica se o número já foi escolhido
+        if (numerosEscolhidos.includes(numero)) {
+            alert(`O número ${numero} já foi escolhido! Por favor, escolha outro número.`);
+            input.value = ""; // Limpa o campo
+            return false; // Impede o envio do formulário
+        }
+        
+        // Verifica se o número já foi digitado
+        if (numerosDigitados.includes(numero)) {
+            alert(`O número ${numero} foi selecionado mais de uma vez. Por favor, escolha números únicos.`);
+            return false; // Impede o envio do formulário
+        }
+        
+        numerosDigitados.push(numero);
+    }
+
+    return true; // Permite o envio do formulário se estiver tudo correto
+}
+
     </script>
 
 </body>
