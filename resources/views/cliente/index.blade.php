@@ -42,7 +42,8 @@
                     <td>
                         @if ($cliente->numerosSorte->count() > 0)
                             @foreach ($cliente->numerosSorte as $numero)
-                               (  {{ $numero->numero }}  ) <!-- Exibindo cada número da sorte -->
+                                ({{ $numero->numero }})
+                                <!-- Exibindo cada número da sorte -->
                             @endforeach
                         @else
                             <span>Sem número da sorte</span>
@@ -142,10 +143,14 @@
         $(document).ready(function() {
             // Inicializar o DataTable
             $('#clientes-table').DataTable({
+                order: [
+                    [0, 'desc']
+                ], // Ordena pela primeira coluna (ID) em ordem decrescente
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.13.5/i18n/pt-BR.json"
                 }
             });
+
 
             // Configurar ClipboardJS para o botão de copiar link
             new ClipboardJS('.copiar-link', {
