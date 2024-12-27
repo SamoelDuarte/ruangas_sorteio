@@ -67,6 +67,8 @@ class SorteioController extends Controller
             'data_inicio' => 'required|date',
             'data_termino' => 'required|date|after_or_equal:data_inicio',
             'numero_sorteio' => 'required|integer|unique:sorteios,numero_sorteio',
+            'numero_min' => 'required|integer',
+            'numero_max' => 'required|integer',
         ]);
 
         // Criar um novo sorteio
@@ -76,6 +78,8 @@ class SorteioController extends Controller
             'data_inicio' => $request->data_inicio,
             'data_termino' => $request->data_termino,
             'numero_sorteio' => $request->numero_sorteio,
+            'numero_min' => $request->numero_min,
+            'numero_max' => $request->numero_max,
         ]);
 
         return redirect()->route('sorteio.index')->with('success', 'Sorteio criado com sucesso!');

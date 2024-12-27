@@ -174,7 +174,7 @@ if (!function_exists('isEscolhido')) {
         .imagem-sorteio {
             width: 153px;
         }
-    
+
         /* Estilo para a versão mobile */
         @media (max-width: 768px) {
             .imagem-sorteio {
@@ -193,9 +193,11 @@ if (!function_exists('isEscolhido')) {
                 <h2><?php echo $cliente->sorteio->nome; ?> </h2>
                 <h1>Ruan Gás</h1>
             </div>
-            <img src="/public/assets/imagens/icone.png" alt="Imagem de fundo" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);  z-index: 1;" class="imagem-sorteio">
+            <img src="/public/assets/imagens/icone.png" alt="Imagem de fundo"
+                style="position: absolute; top: 50%; right: 0; transform: translateY(-50%);  z-index: 1;"
+                class="imagem-sorteio">
         </div>
-    
+
         <!-- Informações do Sorteio -->
         <div class="info-sorteio">
             <p><strong>Número do Sorteio:</strong> <?php echo $cliente->sorteio->numero_sorteio; ?></p>
@@ -203,7 +205,8 @@ if (!function_exists('isEscolhido')) {
             <p><strong>Data de Término:</strong> <?php echo $cliente->sorteio->data_termino_formatada; ?></p>
         </div>
         <!-- Inputs Dinâmicos para Escolher os Números -->
-        <form action="{{ route('sorteio.salvarNumeroSorte', ['id' => $cliente->id]) }}" method="POST" onsubmit="return validarFormulario();">
+        <form action="{{ route('sorteio.salvarNumeroSorte', ['id' => $cliente->id]) }}" method="POST"
+            onsubmit="return validarFormulario();">
             @csrf <!-- Proteção CSRF -->
             <p>Você pode escolher até <strong>{{ $quantidadeNumeros }}</strong> números da sorte.</p>
             <!-- Inputs para escolher números da sorte -->
@@ -211,7 +214,6 @@ if (!function_exists('isEscolhido')) {
                 @for ($i = 0; $i < $quantidadeNumeros; $i++)
                     <input type="text" required class="form-control numero-input" id="numeroInput{{ $i }}"
                         name="numeros_sorte[]" placeholder="Escolha o número {{ $i + 1 }}" maxlength="4">
-
                 @endfor
             </div>
 
@@ -222,7 +224,7 @@ if (!function_exists('isEscolhido')) {
 
     <div class="numero-container" id="numeroContainer">
         <?php
-        for ($i = 1; $i <= 9999; $i++) {
+        for ($i = $cliente->sorteio->numero_min; $i <= $cliente->sorteio->numero_max; $i++) {
             $disabledClass = in_array($i, $numerosEscolhidos) ? 'disabled-btn' : '';
             $onclick = in_array($i, $numerosEscolhidos) ? '' : 'onclick="selecionarNumero(' . $i . ')"';
             echo '<div class="numero-btn ' . $disabledClass . '" ' . $onclick . '>' . $i . '</div>';
@@ -234,10 +236,19 @@ if (!function_exists('isEscolhido')) {
         let numerosEscolhidosCliente = []; // Armazena os números escolhidos
         const numerosEscolhidos = <?php echo json_encode($numerosEscolhidos); ?>;
         const maxNumeros = {{ $quantidadeNumeros }}; // Quantidade máxima de números permitidos
+        const numeroMin = {{ $cliente->sorteio->numero_min }}; // Número mínimo permitido
+        const numeroMax = {{ $cliente->sorteio->numero_max }}; // Número máximo permitido
 
         function validarNumero(numero, nome) {
             // Verifica se o número digitado é válido (não vazio e numérico)
             if (numero.trim() === '') return;
+
+            // Verifica se o número está dentro do intervalo permitido
+            if (numero < numeroMin || numero > numeroMax) {
+                alert(`O número deve estar entre ${numeroMin} e ${numeroMax}.`);
+                document.getElementById(nome).value = ""; // Limpa o campo de input
+                return;
+            }
 
             // Verifica se o número já foi escolhido
             if (numerosEscolhidos.includes(numero)) {
@@ -250,6 +261,12 @@ if (!function_exists('isEscolhido')) {
         function selecionarNumero(numero) {
             if (numerosEscolhidosCliente.length >= maxNumeros) {
                 alert("Você já selecionou todos os números permitidos!");
+                return;
+            }
+
+            // Verifica se o número está dentro do intervalo permitido
+            if (numero < numeroMin || numero > numeroMax) {
+                alert(`O número deve estar entre ${numeroMin} e ${numeroMax}.`);
                 return;
             }
 
@@ -271,37 +288,42 @@ if (!function_exists('isEscolhido')) {
         }
 
         // Função para validar o formulário antes do envio
-      // Função para validar o formulário antes do envio
-function validarFormulario() {
-    // Coleta todos os valores dos campos de entrada
-    const numerosInputs = document.querySelectorAll('input[name="numeros_sorte[]"]');
-    let numerosDigitados = [];
-    
-    for (let input of numerosInputs) {
-        let numero = input.value.trim();
-        
-        if (numero === "") continue; // Ignora campos vazios
-        
-        // Verifica se o número já foi escolhido
-        if (numerosEscolhidos.includes(numero)) {
-            alert(`O número ${numero} já foi escolhido! Por favor, escolha outro número.`);
-            input.value = ""; // Limpa o campo
-            return false; // Impede o envio do formulário
-        }
-        
-        // Verifica se o número já foi digitado
-        if (numerosDigitados.includes(numero)) {
-            alert(`O número ${numero} foi selecionado mais de uma vez. Por favor, escolha números únicos.`);
-            return false; // Impede o envio do formulário
-        }
-        
-        numerosDigitados.push(numero);
-    }
+        function validarFormulario() {
+            // Coleta todos os valores dos campos de entrada
+            const numerosInputs = document.querySelectorAll('input[name="numeros_sorte[]"]');
+            let numerosDigitados = [];
 
-    return true; // Permite o envio do formulário se estiver tudo correto
-}
+            for (let input of numerosInputs) {
+                let numero = input.value.trim();
 
+                if (numero === "") continue; // Ignora campos vazios
+
+                // Verifica se o número já foi escolhido
+                if (numerosEscolhidos.includes(numero)) {
+                    alert(`O número ${numero} já foi escolhido! Por favor, escolha outro número.`);
+                    input.value = ""; // Limpa o campo
+                    return false; // Impede o envio do formulário
+                }
+
+                // Verifica se o número já foi digitado
+                if (numerosDigitados.includes(numero)) {
+                    alert(`O número ${numero} foi selecionado mais de uma vez. Por favor, escolha números únicos.`);
+                    return false; // Impede o envio do formulário
+                }
+
+                // Verifica se o número está dentro do intervalo permitido
+                if (numero < numeroMin || numero > numeroMax) {
+                    alert(`O número ${numero} deve estar entre ${numeroMin} e ${numeroMax}.`);
+                    return false; // Impede o envio do formulário
+                }
+
+                numerosDigitados.push(numero);
+            }
+
+            return true; // Permite o envio do formulário se estiver tudo correto
+        }
     </script>
+
 
 </body>
 

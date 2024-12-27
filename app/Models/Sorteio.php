@@ -15,6 +15,8 @@ class Sorteio extends Model
         'numero_sorteio',
         'data_inicio',
         'data_termino',
+        'numero_min',
+        'numero_max',
     ];
 
     protected $dates = ['data_inicio', 'data_termino']; // Isso já garante a conversão

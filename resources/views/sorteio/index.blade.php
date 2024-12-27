@@ -15,6 +15,8 @@
                     <th>Data de Início</th>
                     <th>Data de Término</th>
                     <th>Número do Sorteio</th>
+                    <th>Valor Mínimo</th>
+                    <th>Valor Máximo</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -25,6 +27,8 @@
                         <td>{{ $sorteio->data_inicio_formatada }}</td>
                         <td>{{ $sorteio->data_termino_formatada }}</td>
                         <td>{{ $sorteio->numero_sorteio }}</td>
+                        <td>{{ $sorteio->numero_min }}</td>
+                        <td>{{ $sorteio->numero_max }}</td>
                         <td>
                             @if ($sorteio->clientes->isEmpty())
                                 <!-- Botão de Deletar -->
@@ -72,6 +76,14 @@
                         <div class="mb-3">
                             <label for="numero_sorteio" class="form-label">Número do Sorteio</label>
                             <input type="number" class="form-control" id="numero_sorteio" name="numero_sorteio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="numero_min" class="form-label">Número Mínimo </label>
+                            <input type="number" class="form-control" id="numero_min" name="numero_min" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="numero_max" class="form-label">Número Máximo</label>
+                            <input type="number" class="form-control" id="numero_max" name="numero_max" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Salvar Sorteio</button>
                     </form>
