@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use App\Models\Sorteio;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ClienteController extends Controller
@@ -16,8 +17,8 @@ class ClienteController extends Controller
         // Carregar os clientes com seus respectivos sorteios e números da sorte
         $clientes = Cliente::with(['sorteio', 'numerosSorte'])->orderBy('id', 'desc')->get();
 
-        // Buscar todos os sorteios disponíveis
-        $sorteios = Sorteio::all();
+        // Buscar todos os sorteios disponíveis (não encerrados)
+        $sorteios = Sorteio::where('data_termino', '>=', Carbon::now())->get();
 
         // Retornar a view com os dados
         return view('cliente.index', compact('clientes', 'sorteios'));
